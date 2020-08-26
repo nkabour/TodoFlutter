@@ -29,7 +29,7 @@ class DBHelper {
   static final columnPriority = 'priority';
   static final columnIsDone = "isDone";
 
-  
+
   // make this a singleton class
   DBHelper._privateConstructor();
   static final DBHelper instance = DBHelper._privateConstructor();
@@ -98,12 +98,6 @@ class DBHelper {
     return Todo.fromMap(res[0]);
   }
 
-  // All of the methods (insert, query, update, delete) can also be done using
-  // raw SQL commands. This method uses a raw query to give the row count.
-  Future<int> queryRowCount(String tableName) async {
-    Database db = await instance.database;
-    return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $tableName'));
-  }
 
   // We are assuming here that the id column in the map is set. The other 
   // column values will be used to update the row.
