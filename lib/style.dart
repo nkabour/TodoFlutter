@@ -15,12 +15,7 @@ TextTheme todoTxtTheme = TextTheme(
 AppBarTheme todoAppBarTheme = AppBarTheme(
     centerTitle: true,
     elevation: 0.0,
-    color: Colors.white,
-    textTheme: TextTheme(
-      headline6: TextStyle(
-          color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
-    ),
-    actionsIconTheme: IconThemeData(color: Colors.indigo[400]));
+    );
 
 
 InputDecorationTheme  todoInputDecorator = InputDecorationTheme(

@@ -5,6 +5,8 @@ import "dart:async";
 import "package:flutter/material.dart";
 import "../../app.dart";
 
+
+
 //can be connected to db connection
 //to check if data exists or not for offline mode
 //also can use to check authinitcation, and connection .
@@ -39,7 +41,7 @@ class _SplashScreenWidget extends State<SplashScreen> {
                       children: [
                         Image.asset(
                           "assets/images/sleek.png",
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                         Text("Jumpin!",
                             style: Theme.of(context).textTheme.headline5),

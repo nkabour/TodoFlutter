@@ -14,6 +14,10 @@ const AddScreen = '/add-todo';
 
 class App extends StatelessWidget {
 
+
+
+
+
   @override 
   Widget build(BuildContext context) {
 
@@ -22,13 +26,16 @@ class App extends StatelessWidget {
       title: 'Jumpin',
       theme: ThemeData(
         primarySwatch: Colors.indigo,
-        textTheme: todoTxtTheme,
+        textTheme:TextTheme(
+                            headline5: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                            caption: TextStyle(color: Colors.black38)),
         appBarTheme: todoAppBarTheme,
         inputDecorationTheme: todoInputDecorator,
         buttonTheme: todoButtonTheme,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: _routes(),
+      
     );
   }
   
@@ -44,13 +51,13 @@ class App extends StatelessWidget {
               screen = SplashScreen(); 
               break; 
         case TodoScreen:
-              screen = TodoWidget(); 
+              screen = TodoList(); 
               break; 
         case AddScreen: 
-              screen = AddTodo(); 
+              screen = AddTodo(id: arguments["id"]); 
               break; 
         case EditScreen: 
-              screen = AddTodo(index: arguments["id"]); 
+              screen = AddTodo(todo: arguments["todo"]); 
               break; 
         default: 
               return null; 

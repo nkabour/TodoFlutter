@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import "../../classes/Todo.dart";
 import "package:to_do_app/app.dart";
+import 'package:to_do_app/database_helper.dart';
 
 class AddTodo extends StatefulWidget {
 
 
-  final int index; 
-  AddTodo({this.index = -1});
+  final int id; 
+  final Todo todo; 
+  AddTodo({this.id = -1, this.todo });
 
   @override
   _Add createState() => _Add();
@@ -25,18 +27,17 @@ Todo todoval = new Todo();
   @override void initState() {
     
     super.initState();
-    int index = widget.index; 
-    Todo todo = Todo.fetchByIndex(index); 
 
-    if(todo != null) {
-    
+    if(widget.todo != null) {
+     
       setState(() {
-        todoval = todo; 
+        todoval = widget.todo; 
         editView = true; 
 
       });
 
     }
+
     
 
   }
@@ -81,13 +82,18 @@ Todo todoval = new Todo();
       onPressed: () {
         if(_key.currentState.validate()){
           _key.currentState.save(); 
-          int index = widget.index; 
+          
           if(editView) {
-            Todo.todolist.removeAt(index); 
+      
+           
+            DBHelper.instance.update(DBHelper.tableTodos, todoval.toMap());
             
-            Todo.todolist.insert(index, todoval); 
           }
-          else Todo.todolist.add(todoval); 
+          else {
+            //todoval.id = widget.id; 
+            DBHelper.instance.insert(DBHelper.tableTodos, todoval.toMap());
+          }
+          // Todo.todolist.add(todoval); 
           Navigator.pushNamed<dynamic>(context, TodoScreen);
 
         }

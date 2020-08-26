@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/app.dart';
 import '../../classes/Todo.dart';
+import 'package:to_do_app/database_helper.dart';
 
 class TodoItem extends StatelessWidget {
+
   TodoItem({this.todoitem});
   final Todo todoitem;
 
@@ -45,9 +47,6 @@ class TodoItem extends StatelessWidget {
 }
 
 class TodoList extends StatefulWidget {
-  final List<Todo> todos;
-
-  TodoList({this.todos});
 
   @override
   _TodoState createState() => _TodoState();
@@ -57,19 +56,55 @@ class _TodoState extends State<TodoList> {
    
   List<Todo> todolist; 
 
+  Future todolistFuture; 
+
   @override void initState() {
     
     super.initState();
-    setState(() => todolist = widget.todos); 
+    todolistFuture = getTodos(); 
+    
   }
 
+  getTodos() async {
+
+    return await DBHelper.instance.queryAllRows(DBHelper.tableTodos);
+  }
+
+  double _swipeStartX;
+  String _swipeDirection;
   @override
   Widget build(BuildContext context) {
-    double _swipeStartX;
-    String _swipeDirection;
+  
+    return Scaffold(
+      appBar: AppBar(title: Text('ToDos')),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Align(
+          child:FutureBuilder(
+                    future: todolistFuture,
+                    builder: _futureBuilder,),
+          alignment: Alignment.center,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed<dynamic>(context, AddScreen, arguments: {"id": todolist.length});
+        },
+        child: Icon(Icons.add),
+        tooltip: "Add",
+      ),
+    );
+ 
+  }
 
-    return todolist.isEmpty
-        ? FittedBox(
+
+  _onEdit(BuildContext context, Todo todo) {
+    return Navigator.pushNamed<dynamic>(context, EditScreen,
+        arguments: {"todo": todo});
+  }
+
+  _emptyTodoList(){
+    return FittedBox(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: Column(
@@ -80,14 +115,21 @@ class _TodoState extends State<TodoList> {
                     "assets/images/meditate.png",
                     fit: BoxFit.contain,
                   ),
-                  Text("No Todos", style: Theme.of(context).textTheme.caption),
+                  Text("No Todos", style: Theme.of(context).textTheme.caption.copyWith(
+                    color: Colors.black,
+                  )),
 
                   //add loader widget here.
                 ],
               ),
             ),
-          )
-        : ListView.builder(
+          );
+  }
+
+
+  _todoListBuilder(BuildContext context) {
+
+    return  ListView.builder(
             itemCount: todolist.length,
             itemBuilder: (context, index) {
               return GestureDetector(
@@ -97,47 +139,52 @@ class _TodoState extends State<TodoList> {
                       e.globalPosition.dx > _swipeStartX ? "Right" : "Left",
                   onHorizontalDragEnd: (e) async {
                     if (_swipeDirection == "Right")
-                      setState(() => todolist.removeAt(index));
+                      setState(() {
+                        DBHelper.instance.delete(DBHelper.tableTodos, todolist[index].id);
+                        todolist.removeAt(index);
+                      });
+                    
                     else {
-                      _onEdit(context, index);
+                      _onEdit(context, todolist[index]);
                     }
                   },
                   onTap: () {
-                    setState(
-                        () => todolist[index].isDone = !todolist[index].isDone);
+                    setState(() {
+                           
+                           todolist[index].isDone = !todolist[index].isDone;
+                           DBHelper.instance.update(DBHelper.tableTodos, todolist[index].toMap());
+                    
+                        });
+                  
+                   
                   },
                   child: TodoItem(todoitem: todolist[index]));
             });
   }
 
-  _onEdit(BuildContext context, int index) {
-    return Navigator.pushNamed<dynamic>(context, EditScreen,
-        arguments: {"id": index});
-  }
-}
+  Widget _futureBuilder (context, snap) {
+   
 
-class TodoWidget extends StatelessWidget {
+        if(snap.hasError){
+
+          print(snap.error);
+          return Text("Shoot couldn't connect to db");  
+        }
+        else if(!snap.hasData){
+            
+            return CircularProgressIndicator();
+
+        }
+        else if(snap.hasData){
+          todolist = snap.data;
+          return todolist.isEmpty ? _emptyTodoList() : _todoListBuilder(context);
+
+        }
+
+        return Text("Shoot something's wrong!"); 
   
-  final List<Todo> todolist = Todo.fetchAll();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('ToDos')),
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Align(
-          child: TodoList(todos: todolist),
-          alignment: Alignment.center,
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed<dynamic>(context, AddScreen);
-        },
-        child: Icon(Icons.add),
-        tooltip: "Add",
-      ),
-    );
+      
   }
+
 }
+
