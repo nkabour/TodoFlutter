@@ -82,7 +82,8 @@ class _TodoState extends State<TodoList> {
         child: Align(
           child:FutureBuilder(
                     future: todolistFuture,
-                    builder: _futureBuilder,),
+                    builder: _futureBuilder,
+                    ),
           alignment: Alignment.center,
         ),
       ),

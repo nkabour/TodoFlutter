@@ -1,10 +1,6 @@
 //i stands for impact and e stands for effort
 //so lowi lowe is low effort low impact
 
-import "dart:convert";
-
-import 'package:flutter/scheduler.dart';
-
 
 enum Priorites {
   lowi_lowe, //fillins

@@ -49,7 +49,7 @@ class DBHelper {
     String path = join(documentsDirectory.path, _dbName);
     return await openDatabase(path,
         version: _dbVersion,
-        onCreate: _onCreate);
+        onCreate: _onCreate );
   }
 
   // SQL code to create the database table
